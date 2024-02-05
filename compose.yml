@@ -1,0 +1,23 @@
+services:
+  php:
+    image: php8302-for-test:1.0
+    depends_on:
+      - db
+    volumes:
+      - ./:/home/www-data/application:rw
+    networks:
+      - internal
+    env_file:
+      - .env
+  db:
+    image: mariadb:11.2.2
+    networks:
+      - internal
+    env_file:
+      - .env
+networks:
+  internal:
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNETWORK}
