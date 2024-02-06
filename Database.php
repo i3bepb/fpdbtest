@@ -8,10 +8,15 @@ use stdClass;
 
 class Database implements DatabaseInterface
 {
-    const string DELETE_BLOCK = 'f0dd7b9da342491ab35d9256b248a1e1';
+    private string $uniqBlock;
 
-    public function __construct(private mysqli $mysqli)
-    {}
+    private mysqli $mysqli;
+
+    public function __construct(mysqli $mysqli)
+    {
+        $this->mysqli = $mysqli;
+        $this->uniqBlock = uniqid(more_entropy: true);
+    }
 
     public function buildQuery(string $query, array $args = []): string
     {
@@ -108,7 +113,7 @@ class Database implements DatabaseInterface
             'double' => "{$value}",
             'boolean' => $value ? '1' : '0',
             'NULL' => 'NULL',
-            'object' => self::DELETE_BLOCK,
+            'object' => $this->uniqBlock,
             default => throw new Exception('Значение не предусмотренного типа'),
         };
     }
@@ -123,7 +128,7 @@ class Database implements DatabaseInterface
     private function escapeQuestionD(int|object|null $value): string
     {
         if (is_object($value)) {
-            return self::DELETE_BLOCK;
+            return $this->uniqBlock;
         }
         if (is_null($value)) {
             return 'NULL';
@@ -141,7 +146,7 @@ class Database implements DatabaseInterface
     private function escapeQuestionF(float|object|null $value): string
     {
         if (is_object($value)) {
-            return self::DELETE_BLOCK;
+            return $this->uniqBlock;
         }
         if (is_null($value)) {
             return 'NULL';
@@ -161,7 +166,7 @@ class Database implements DatabaseInterface
     private function escapeQuestionA(array|object $value): string
     {
         if (is_object($value)) {
-            return self::DELETE_BLOCK;
+            return $this->uniqBlock;
         }
         $escapeValue = '';
         $firstKey = array_key_first($value);
@@ -195,7 +200,7 @@ class Database implements DatabaseInterface
     private function escapeQuestionSharp(array|string|object $value): string
     {
         if (is_object($value)) {
-            return self::DELETE_BLOCK;
+            return $this->uniqBlock;
         }
         if (is_array($value)) {
             $escapeValue = '';
@@ -262,7 +267,7 @@ class Database implements DatabaseInterface
      */
     private function deleteBlock(string $query): string
     {
-        $query = preg_replace('/\\{[^\\{]*?' . self::DELETE_BLOCK . '[^\\}]*?\\}/i', '', $query);
+        $query = preg_replace('/\\{[^\\{]*?' . $this->uniqBlock . '[^\\}]*?\\}/i', '', $query);
         return str_replace(['{','}'], '', $query);
     }
 }

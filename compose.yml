@@ -1,6 +1,11 @@
 services:
   php:
-    image: php8302-for-test:1.0
+    build:
+      context: .
+      dockerfile: environment/php/Dockerfile
+      args:
+        LOCAL_USER_ID_ARG: ${LOCAL_USER_ID}
+        LOCAL_GROUP_ID_ARG: ${LOCAL_GROUP_ID}
     depends_on:
       - db
     volumes:

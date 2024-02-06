@@ -11,4 +11,6 @@ RUN apk add --no-cache shadow \
     && groupmod -g ${LOCAL_GROUP_ID} www-data && usermod -u ${LOCAL_USER_ID} -g ${LOCAL_GROUP_ID} www-data \
     && chown -R ${LOCAL_USER_ID}:${LOCAL_GROUP_ID} /home/www-data
 
+COPY . /home/www-data/application/
+
 USER www-data
